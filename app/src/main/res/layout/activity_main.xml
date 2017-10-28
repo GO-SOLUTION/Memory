@@ -14,4 +14,5 @@
         android:layout_marginRight="325dp"
         app:layout_constraintRight_toRightOf="parent" />
 
+    <include layout="@layout/rowlayout" />
 </android.support.constraint.ConstraintLayout>

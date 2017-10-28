@@ -4,36 +4,72 @@ package go_solution.memory;
  * Created by ralphniederer on 24.10.17.
  */
         import android.support.v7.widget.RecyclerView;
+        import android.content.Context;
+        import android.graphics.BitmapFactory;
+        import android.support.v7.widget.CardView;
         import android.view.LayoutInflater;
         import android.view.View;
         import android.view.ViewGroup;
+        import android.widget.ImageView;
         import android.widget.TextView;
 
-public class CustomAdapter extends RecyclerView.Adapter {
-    @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        // infalte the item Layout
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rowlayout, parent, false);
-        // set the view's size, margins, paddings and layout parameters
-        MyViewHolder vh = new MyViewHolder(v); // pass the view to View Holder
-        return vh;
-    }
+        import java.util.List;
 
-    @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHolder> {
 
-    }
-    @Override
-    public int getItemCount() {
-        return 0;
-    }
+    private List<Saver> setData;
+    private MainActivity mact;
+    private Context inhalt;
+
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView textView;// init the item view's
+
+        public ImageView bild;
+        public TextView text;
+        public CardView cview;
+
         public MyViewHolder(View itemView) {
             super(itemView);
-
-// get the reference of item view's
-            textView = (TextView) itemView.findViewById(R.id.textView);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v){
+                    mact.takeQrCodePicture();
+                    mact.clicks = getAdapterPosition();
+                }
+            });
+            this.cview = (CardView)itemView.findViewById(R.id.cview);
+            this.bild = (ImageView)itemView.findViewById(R.id.image);
+            this.text = (TextView)itemView.findViewById(R.id.text);
         }
     }
+
+    public CustomAdapter(List<Saver> setData, Context inhalt, MainActivity mainActivity){
+        this.setData = setData;
+        this.inhalt = inhalt;
+        this.mact = mainActivity;
+    }
+
+
+    @Override
+    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.rowlayout, parent, false);
+        MyViewHolder mem = new MyViewHolder(view);
+        return mem;
+    }
+
+    @Override
+    public void onBindViewHolder(MyViewHolder myViewHolder, int position) {
+        if (!setData.get(position).getCode().equals("") && !setData.get(position).getpath().equals("")) {
+            myViewHolder.bild.setImageBitmap(BitmapFactory.decodeFile(setData.get(position).getpath()));
+            myViewHolder.text.setText(setData.get(position).getCode());
+        } else {
+            myViewHolder.bild.setImageDrawable(inhalt.getResources().getDrawable(R.drawable.takeit));
+            myViewHolder.text.setText("");
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        return setData.size();
+    }
+
 }
