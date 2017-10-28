@@ -10,7 +10,7 @@ public class Saver {
 
     public Saver() {}
 
-    public String getpath() {
+    public String getPath() {
         return this.path;
     }
 

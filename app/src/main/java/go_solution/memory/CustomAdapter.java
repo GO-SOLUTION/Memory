@@ -16,13 +16,11 @@ package go_solution.memory;
         import java.util.List;
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHolder> {
-
     private List<Saver> setData;
     private MainActivity mact;
     private Context inhalt;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-
         public ImageView bild;
         public TextView text;
         public CardView cview;
@@ -42,24 +40,28 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
         }
     }
 
-    public CustomAdapter(List<Saver> setData, Context inhalt, MainActivity mainActivity){
-        this.setData = setData;
-        this.inhalt = inhalt;
-        this.mact = mainActivity;
+    public CustomAdapter(List<Saver> SetData, Context Inhalt, MainActivity MainActivity){
+        this.setData = SetData;
+        this.inhalt = Inhalt;
+        this.mact = MainActivity;
     }
 
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+    }
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.rowlayout, parent, false);
-        MyViewHolder mem = new MyViewHolder(view);
-        return mem;
+        MyViewHolder myViewHolder = new MyViewHolder(view);
+        return myViewHolder;
     }
 
     @Override
     public void onBindViewHolder(MyViewHolder myViewHolder, int position) {
-        if (!setData.get(position).getCode().equals("") && !setData.get(position).getpath().equals("")) {
-            myViewHolder.bild.setImageBitmap(BitmapFactory.decodeFile(setData.get(position).getpath()));
+        if (!setData.get(position).getCode().equals("") && !setData.get(position).getPath().equals("")) {
+            myViewHolder.bild.setImageBitmap(BitmapFactory.decodeFile(setData.get(position).getPath()));
             myViewHolder.text.setText(setData.get(position).getCode());
         } else {
             myViewHolder.bild.setImageDrawable(inhalt.getResources().getDrawable(R.drawable.takeit));
