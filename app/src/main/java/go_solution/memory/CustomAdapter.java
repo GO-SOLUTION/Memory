@@ -3,17 +3,17 @@ package go_solution.memory;
 /**
  * Created by ralphniederer on 24.10.17.
  */
-        import android.support.v7.widget.RecyclerView;
-        import android.content.Context;
-        import android.graphics.BitmapFactory;
-        import android.support.v7.widget.CardView;
-        import android.view.LayoutInflater;
-        import android.view.View;
-        import android.view.ViewGroup;
-        import android.widget.ImageView;
-        import android.widget.TextView;
+import android.support.v7.widget.RecyclerView;
+import android.content.Context;
+import android.graphics.BitmapFactory;
+import android.support.v7.widget.CardView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-        import java.util.List;
+import java.util.List;
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHolder> {
     private List<Saver> setData;

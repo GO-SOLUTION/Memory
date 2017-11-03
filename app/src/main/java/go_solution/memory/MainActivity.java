@@ -24,13 +24,11 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private static final int SCAN_QR_CODE_REQUEST_CODE = 0;
-
     private List<Saver> datasave;
-    public int clicks;
-
     private RecyclerView rv;
     private RecyclerView.Adapter rvadapter;
     private RecyclerView.LayoutManager rvmanager;
+    public int clicks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,23 +36,34 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         datasave = new ArrayList<>();
         datasave.add(new Saver());
-
         rv = (RecyclerView)findViewById(R.id.recycler);
         rv.setHasFixedSize(false);
         rvmanager = new GridLayoutManager(this, 2);
         rv.setLayoutManager(rvmanager);
         rvadapter = new CustomAdapter(datasave,getApplicationContext(),this);
         rv.setAdapter(rvadapter);
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        int rs = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        if (rs == R.id.action_reset){
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuItem menuItem = menu.add("Log");
-        menuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        MenuItem menuLog = menu.add("Log");
+        MenuItem menuReset = menu.add("Reset"); //new
+        menuLog.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 try {
@@ -64,10 +73,34 @@ public class MainActivity extends AppCompatActivity {
                 }
                 return false;
             }
-        });
 
+        });
+        menuReset.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                try {
+                    reset(rvadapter);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return false;
+            }
+
+        });
         return super.onCreateOptionsMenu(menu);
     }
+
+
+    private void reset(RecyclerView.Adapter rvadapter) {
+        int size = datasave.size();
+        for(int position = 0; position<size;position++) {
+            datasave.remove(position);
+            rv.removeViewAt(position);
+            rvadapter.notifyItemRemoved(position);
+            rvadapter.notifyItemRangeChanged(position, datasave.size());
+        }
+    }
+
 
     public void takeQrCodePicture() {
         IntentIntegrator integrator = new IntentIntegrator(this);
@@ -78,13 +111,28 @@ public class MainActivity extends AppCompatActivity {
         integrator.initiateScan();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+
+    private void log(List<Saver> memoryCards) throws JSONException {
+        Intent intent = new Intent("ch.appquest.intent.LOG");
+        if (getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY).isEmpty()) {
+            Toast.makeText(this, "Logbook App not installed", Toast.LENGTH_LONG).show();
+            return;
         }
-        return super.onOptionsItemSelected(item);
+        JSONArray jarr = new JSONArray();
+        for (int i = 0; i < memoryCards.size();i+=2) {
+            if (i+1 <= datasave.size() -1) {
+                JSONArray arr = new JSONArray();
+                arr.put(memoryCards.get(i).getCode());
+                arr.put(memoryCards.get(i + 1).getCode());
+                jarr.put(arr);
+            }
+        }
+        JSONObject jsonMessage = new JSONObject();
+        jsonMessage.put("task", "Memory");
+        jsonMessage.put("solution", jarr);
+        String message = jsonMessage.toString();
+        intent.putExtra("ch.appquest.logmessage", message);
+        startActivity(intent);
     }
 
     @Override
@@ -92,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
         Log.i("MemoryActivity", "onActivityResult: ");
         if (requestCode == IntentIntegrator.REQUEST_CODE
                 && resultCode == RESULT_OK) {
-
             Bundle extras = data.getExtras();
             String path = extras.getString(
                     Intents.Scan.RESULT_BARCODE_IMAGE_PATH);
@@ -104,39 +151,9 @@ public class MainActivity extends AppCompatActivity {
                 datasave.add(new Saver());
                 datasave.add(new Saver());
             }
-
             rvadapter.notifyDataSetChanged();
-
-
         }
     }
-
-    private void log(List<Saver> memoryCards) throws JSONException {
-        Intent intent = new Intent("ch.appquest.intent.LOG");
-
-        if (getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY).isEmpty()) {
-            Toast.makeText(this, "Logbook App not installed", Toast.LENGTH_LONG).show();
-            return;
-        }
-        JSONArray jsonArrayMain = new JSONArray();
-        for (int i = 0; i < memoryCards.size();i+=2) {
-            if (i+1 <= datasave.size() -1) {
-                JSONArray jsonArray = new JSONArray();
-                jsonArray.put(memoryCards.get(i).getCode());
-                jsonArray.put(memoryCards.get(i + 1).getCode());
-                jsonArrayMain.put(jsonArray);
-            }
-        }
-        JSONObject jsonMessage = new JSONObject();
-        jsonMessage.put("task", "Memory");
-        jsonMessage.put("solution", jsonArrayMain);
-        String message = jsonMessage.toString();
-
-        intent.putExtra("ch.appquest.logmessage", message);
-
-        startActivity(intent);
-    }
-
 }
 
 
